@@ -86,3 +86,5 @@ CREATE TABLE ficha (
   fecha_hora TIMESTAMP NOT NULL,
   comentario TEXT NOT NULL
 );
+
+voy a ver si alcanzo a hacer algo en la mñana 
