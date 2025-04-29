@@ -1,0 +1,42 @@
+from faker import Faker
+import random
+import csv
+fake = Faker('es_CL')  #con esto practicamente los valores van a ser en su mayoria chilenos (nombres, direcciones, etc)
+
+#metodo para generar un rut porque mockaroo vale callampa
+def generar_rut():
+    rut = random.randint(10000000, 99999999)
+    dv = random.choice(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'])
+    return f"{rut}-{dv}"
+
+#con este metodo crearemos los datos de los pacientes
+def generar_paciente(num_pacientes):
+    pacientes = []
+    previsiones = ["Fonasa", "Isapre"]
+
+    # Generar pacientes
+    for _ in range(num_pacientes):
+        nombres = fake.first_name() + " " + fake.first_name()
+        apellido_p = fake.last_name_male()
+        apellido_m = fake.last_name_female()
+        rut = generar_rut()
+        telefono = "+569" + str(random.randint(10000000, 99999999))
+        correo = fake.email()
+        direccion = fake.street_name()[:50] #aqui me ayudo chatGPT para recortar las direcciones
+        prevision = random.choice(previsiones)
+        fecha_nac = fake.date_of_birth(minimum_age=0, maximum_age=90)
+        fecha_reg = fake.date_this_decade()
+        
+        pacientes.append([rut, nombres, apellido_p, apellido_m, telefono, correo, direccion, prevision, fecha_nac, fecha_reg])
+
+    return pacientes
+
+#Generaremos 1000 pacientes
+paciente_data = generar_paciente(1000)
+
+# Guardar en un archivo CSV para importarlo a la base de datos
+with open('paciente_data.csv', 'w', newline='', encoding='utf-8') as file:
+    writer = csv.writer(file)
+    writer.writerow(["rut", "nombres", "apellido_p", "apellido_m", "telefono", "correo", "direccion", "prevision", "fecha_nac", "fecha_reg"])
+    writer.writerows(paciente_data)          
+print("Datos de personal generados correctamente.")
