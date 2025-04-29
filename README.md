@@ -87,4 +87,8 @@ CREATE TABLE ficha (
   comentario TEXT NOT NULL
 );
 
+dentro de los archivos.py hay algunos que use y otros que no como por ejemplo el de procedimiento porque me quedo malo y era preferible hacerlo a mano al ser tan poquitos los datos que habia que poner.
+
+#A la hora de importar los csv en las tablas asegurate de que antes de importarlo, en las opciones le des un tick al HEADS (no me acuerdo como se llamaba exactamente la opcion disculpa)
+
 voy a ver si alcanzo a hacer algo en la mñana 
