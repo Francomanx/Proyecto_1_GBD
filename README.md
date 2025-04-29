@@ -91,4 +91,10 @@ dentro de los archivos.py hay algunos que use y otros que no como por ejemplo el
 
 # A la hora de importar los csv en las tablas asegurate de que antes de importarlo, en las opciones le des un tick al HEADS (no me acuerdo como se llamaba exactamente la opcion disculpa)
 
+Orden recomendado de los imports:
+1.- personal
+2.- paciente
+3.- procedimiento
+4.- hora
+
 voy a ver si alcanzo a hacer algo en la mñana 
