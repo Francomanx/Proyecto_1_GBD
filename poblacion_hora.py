@@ -11,7 +11,7 @@ def generar_horas(num_horas, medicos, administrativos):
     id_counter = 1
 
     # Calculo para conseguir la cantidad de horas que estaran activas (95%)
-    total_horas = int(num_horas / 0.95)  
+    total_horas = int(num_horas * 1.05)  
 
     for _ in range(total_horas):
         # Generacion de fecha y hora en base a un solo mes juasjuas (avergonzado por pedir ayuda a ChatGPT)
@@ -32,14 +32,23 @@ def generar_horas(num_horas, medicos, administrativos):
         else:
             tipo = 2 #pabellon
             web = 'no'
+        
+        # Sobrecupo.
+        if any(h[2] == medico and h[1] == fecha_hora for h in horas):
+            sobrecupo = 'si'
+        else:
+            sobrecupo = 'no'
 
         # Definir estado (5% anuladas)
         if random.random() < 0.05:
             estado = 2 # cancelada
         else:
             estado = random.choice([0,1]) #disponible o reservada
-        #hay una condicion que es sobre el sobrecupo, nose como aplicarla pero se como evadirla sin infringirla juajuajua (c r e o)
-        horas.append([id_counter,fecha_hora.strftime('%Y-%m-%d %H:%M:%S'),medico,personal,tipo,web,'no',estado])
+
+        # Agregar hora.
+        horas.append([id_counter,fecha_hora.strftime('%Y-%m-%d %H:%M:%S'),medico,personal,tipo,web,sobrecupo,estado])
+
+        # Siguiente ID.
         id_counter += 1
 
     return horas
