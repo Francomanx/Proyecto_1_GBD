@@ -114,7 +114,7 @@ pip install faker
 # Consideraciones
 - Implementar la codificación UTF-8 a los datos mediante la libreria unicodedata.
 
-# Indices agregados
+## Indices agregados
 - **Contexto de la Query:** Ingreso de cada profesional y monto que cobra el centro de salud a cada profesional en arriendos de instalaciones.
 El cobro par consultas medicas corresponde a un porcentaje definido por medico.
 Cada procedimiento que se realiza en pabellon tiene 5% de para la empresa.  
@@ -123,26 +123,26 @@ Query para generar reportes de contabilidad:
 
 ```sql
 select
-  personal.rut AS 'RUT del Profesional',
-  personal.nombre || ' ' || personal.apellido AS 'Nombre Completo',
+  personal.rut AS "RUT del Profesional",
+  personal.nombre || ' ' || personal.apellido AS "Nombre Completo",
   SUM(
     CASE
       -- Consulta médica.
-      WHEN horas.tipo = 1 THEN transaccion.monto * personal.porcentaje
+      WHEN horas.tipo = 1 THEN transaccion.monto * (1-personal.porcentaje)
       -- Pabellón.
       WHEN horas.tipo = 2 THEN transaccion.monto * 0.05                     
       ELSE 0
     END
-  ) AS 'Pago a la Empresa',
+  ) AS "Pago a la Empresa",
   SUM(
     CASE
       -- Consulta médica.
-      WHEN horas.tipo = 1 THEN transaccion.monto * (1-transaccion.porcentaje)
+      WHEN horas.tipo = 1 THEN transaccion.monto * transaccion.porcentaje
       -- Pabellón.
       WHEN horas.tipo = 2 THEN transaccion.monto * 0.95                     
       ELSE 0
     END
-  ) AS 'Ingreso del Profesional'
+  ) AS "Ingreso del Profesional"
 FROM
   transaccion
   JOIN horas ON transaccion.id_hora = horas.id
@@ -150,7 +150,7 @@ FROM
 GROUP BY
   personal.rut, personal.nombre, personal.apellido
 ORDER BY
-  'Ingreso del Profesional' DESC;
+  "Ingreso del Profesional" DESC;
 ```
 
 ### Indices posibles:
@@ -168,3 +168,89 @@ CREATE INDEX idx_transaccion_id_hora ON transaccion USING HASH (id_hora);
 ```sql
 CREATE INDEX idx_transaccion_rut_personal ON transaccion USING HASH (rut_personal);
 ```
+
+## Querys solicitadas
+
+- ***a.*** Montos por pagar a cada médico por concepto de Consultas y/o Pabellones, separar ambos registros.
+```sql 
+SELECT 
+personal.rut AS "RUT del Profesional",
+personal.nombre || ' ' || personal.apellido AS "Nombre Completo",
+SUM(
+    CASE
+      -- Consulta médica.
+      WHEN horas.tipo = 1 THEN transaccion.monto * transaccion.porcentaje 
+      ELSE 0
+    END
+) AS "Ingreso por Consultas",
+SUM(
+    CASE
+         -- Pabellón.
+      WHEN horas.tipo = 2 THEN transaccion.monto * 0.95
+      ELSE 0
+    END
+) AS "Ingreso por Pabellones"
+FROM transaccion
+JOIN horas ON transaccion.id_hora = horas.id 
+JOIN personal ON transaccion.rut_personal = personal.rut
+GROUP BY
+  personal.rut, personal.nombre, personal.apellido
+ORDER BY
+  "Ingreso del Profesional" DESC;
+
+```
+
+- ***b.*** Montos por cobrar a cada médico por concepto de arriendo de las instalaciones.
+```sql
+SELECT 
+personal.rut AS "RUT del Profesional",
+personal.nombre || ' ' || personal.apellido AS "Nombre Completo",
+SUM(
+    CASE
+      -- Consulta médica.
+      WHEN horas.tipo = 1 THEN transaccion.monto * (1-personal.porcentaje)
+      -- Pabellón.
+      WHEN horas.tipo = 2 THEN transaccion.monto * 0.05                     
+      ELSE 0
+    END
+) AS "Cobros por Arriendo"
+FROM transaccion
+JOIN horas ON transaccion.id_hora = horas.id 
+JOIN personal ON transaccion.rut_personal = personal.rut
+GROUP BY
+  personal.rut, personal.nombre, personal.apellido
+ORDER BY
+  "Ingreso del Profesional" DESC;
+```
+
+- ***c.*** Utilidades percibidas por el centro de salud por Consultas, Pabellones y Arriendos.
+```sql
+SELECT
+SUM(
+    CASE
+      -- Consulta médica.
+      WHEN horas.tipo = 1 THEN transaccion.monto * (1-personal.porcentaje)
+      ELSE 0
+    END
+) AS "Utilidades por Consultas",
+SUM(
+    CASE
+      -- Pabellón.
+        WHEN horas.tipo = 2 THEN transaccion.monto * 0.05                     
+        ELSE 0
+    END
+) AS "Utilidades por Pabellones",
+SUM(
+    CASE
+      -- Arriendos.
+      WHEN horas.tipo = 1 THEN transaccion.monto * (1-personal.porcentaje)
+      WHEN horas.tipo = 2 THEN transaccion.monto * 0.05                     
+      ELSE 0
+    END
+) AS "Utilidades Total por Arriendos"
+FROM transaccion
+JOIN horas ON transaccion.id_hora = horas.id 
+JOIN personal ON transaccion.rut_personal = personal.rut;
+```
+
+## Tablas desnormalizadas
