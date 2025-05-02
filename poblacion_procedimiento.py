@@ -11,7 +11,7 @@ def generar_procedimiento(num_procedimientos):
     for i in range(1,num_procedimientos + 1):
         id = i
         if i==1:#El primer procedimiento sera una consulta medica
-            nombre = "Consulta Médica"
+            nombre = "Consulta Medica"
             area = "Consulta"
             valor = 50500
         else:#El resto seran cirugias
