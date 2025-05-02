@@ -4,7 +4,7 @@ import csv
 import unicodedata
 fake = Faker('es_CL')  #con esto practicamente los valores van a ser en su mayoria chilenos (nombres, direcciones, etc)
 
-#metodo para generar un rut porque mockaroo vale callampa
+#metodo para generar un rut
 def generar_rut():
     rut = random.randint(10000000, 99999999)
     dv = random.choice(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'])
@@ -21,7 +21,7 @@ def generar_paciente(num_pacientes):
     pacientes = []
     previsiones = ["Fonasa", "Isapre"]
 
-    # Generar pacientes
+    #generar pacientes
     for _ in range(num_pacientes):
         nombres = limpiar_texto(fake.first_name() + " " + fake.first_name())
         apellido_p = limpiar_texto(fake.last_name_male())
@@ -29,7 +29,11 @@ def generar_paciente(num_pacientes):
         rut = generar_rut()
         telefono = "+569" + str(random.randint(10000000, 99999999))
         correo = limpiar_texto(fake.email())
+<<<<<<< HEAD
         direccion = limpiar_texto(fake.street_name()[:50])
+=======
+        direccion = limpiar_texto(fake.street_name()[:50]) #solo se usan direcciones que no superen los 50 caracteres
+>>>>>>> 3a26ad0f46a1c7f6778e2b2069fbb49de1653b6b
         prevision = random.choice(previsiones)
         fecha_nac = fake.date_of_birth(minimum_age=0, maximum_age=90)
         fecha_reg = fake.date_this_decade()
@@ -39,10 +43,10 @@ def generar_paciente(num_pacientes):
 
     return pacientes
 
-#Generaremos 1000 pacientes
+#generaremos 250 pacientes
 paciente_data = generar_paciente(250)
 
-# Guardar en un archivo CSV para importarlo a la base de datos
+#y los guardamos en un archivo.csv
 with open('paciente_data.csv', 'w', newline='', encoding='utf-8') as file:
     writer = csv.writer(file)
     writer.writerow(["rut", "nombres", "apellido_p", "apellido_m", "telefono", "correo", "direccion", "prevision", "fecha_nac", "fecha_reg"])
