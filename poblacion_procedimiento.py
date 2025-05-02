@@ -7,20 +7,17 @@ fake = Faker('es_CL')  #con esto practicamente los valores van a ser en su mayor
 #con este metodo crearemos los datos de los procedimientos
 def generar_procedimiento(num_procedimientos):
     procedimientos = []
-    nombre_procedimientos = ["Consulta Medica", "Cirugia"]
-    numero_cirugia = 1
-    # Generar pacientes
-    for i in range(1,num_procedimientos):
+
+    for i in range(1,num_procedimientos + 1):
         id = i
-        nombre = random.choice(nombre_procedimientos)
-        if nombre=="Consulta Medica":
+        if i==1:#El primer procedimiento sera una consulta medica
+            nombre = "Consulta Médica"
             area = "Consulta"
             valor = 50500
-        elif nombre=="Cirugia":
-            nombre = f"Cirugia {numero_cirugia}"
+        else:#El resto seran cirugias
+            nombre = f"Cirugia {id - 1}"
             area = "Pabellon"
             valor = random.randint(1500000, 3500000)
-            numero_cirugia=+1
         procedimientos.append([id, nombre, area, valor])
 
     return procedimientos
@@ -28,9 +25,9 @@ def generar_procedimiento(num_procedimientos):
 #Generaremos 16 procedimientos
 procedimiento_data = generar_procedimiento(16)
 
-# Guardar en un archivo CSV para importarlo a la base de datos
+#Y lo guardamos en un archivo.csv
 with open('procedimiento_data.csv', 'w', newline='', encoding='utf-8') as file:
     writer = csv.writer(file)
     writer.writerow(["id", "nombre", "area", "valor"])
     writer.writerows(procedimiento_data)          
-print("Datos de personal generados correctamente.")
+print("Datos de procedimientos generados correctamente.")
