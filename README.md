@@ -160,13 +160,13 @@ ORDER BY
 - transaccion.rut_personal (B, deberia tener la misma cantidad de elementos que horas).
 
 ```sql
-CREATE INDEX idx_horas_id ON horas USING HASH (id);
+CREATE INDEX idx_horas_id ON horas USING BTREE (id);
 ```
 ```sql
-CREATE INDEX idx_transaccion_id_hora ON transaccion USING HASH (id_hora);
+CREATE INDEX idx_transaccion_id_hora ON transaccion USING BTREE (id_hora);
 ```
 ```sql
-CREATE INDEX idx_transaccion_rut_personal ON transaccion USING HASH (rut_personal);
+CREATE INDEX idx_transaccion_rut_personal ON transaccion USING BTREE (rut_personal);
 ```
 
 ## Querys solicitadas
@@ -197,7 +197,6 @@ GROUP BY
   personal.rut, personal.nombre, personal.apellido
 ORDER BY
   "Ingreso del Profesional" DESC;
-
 ```
 
 - ***b.*** Montos por cobrar a cada médico por concepto de arriendo de las instalaciones.
@@ -254,3 +253,31 @@ JOIN personal ON transaccion.rut_personal = personal.rut;
 ```
 
 ## Tablas desnormalizadas
+
+```sql
+CREATE TABLE reporte_contable AS
+SELECT
+  transaccion.id AS id_transaccion,
+  transaccion.fecha_hora,
+  transaccion.rut_paciente,
+  transaccion.rut_personal AS rut_medico,
+  personal.nombre AS nombre_medico,
+  personal.apellido AS apellido_medico,
+  personal.porcentaje,
+  horas.tipo AS tipo_atencion,
+  transaccion.monto,
+  CASE
+      WHEN horas.tipo = 1 THEN transaccion.monto * (1-personal.porcentaje)
+      WHEN horas.tipo = 2 THEN transaccion.monto * 0.05     
+    ELSE 0
+  END AS utilidad_empresa,
+  CASE
+      WHEN horas.tipo = 1 THEN transaccion.monto * transaccion.porcentaje 
+      WHEN horas.tipo = 2 THEN transaccion.monto * 0.95
+    ELSE 0
+  END AS ingreso_profesional
+FROM
+  transaccion
+  JOIN horas ON transaccion.id_hora = h.id
+  JOIN personal ON transaccion.rut_personal = p.rut;
+```

@@ -29,12 +29,13 @@ def generar_paciente(num_pacientes):
         rut = generar_rut()
         telefono = "+569" + str(random.randint(10000000, 99999999))
         correo = limpiar_texto(fake.email())
-        direccion = limpiar_texto(fake.street_name()[:50]) #aqui me ayudo chatGPT para recortar las direcciones
+        direccion = limpiar_texto(fake.street_name()[:50])
         prevision = random.choice(previsiones)
         fecha_nac = fake.date_of_birth(minimum_age=0, maximum_age=90)
         fecha_reg = fake.date_this_decade()
         
-        pacientes.append([rut, nombres, apellido_p, apellido_m, telefono, correo, direccion, prevision, fecha_nac, fecha_reg])
+        pacientes.append([rut, nombres, apellido_p, apellido_m, 
+                          telefono, correo, direccion, prevision, fecha_nac, fecha_reg])
 
     return pacientes
 
