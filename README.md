@@ -95,15 +95,18 @@ CREATE TABLE ficha (
   comentario TEXT NOT NULL
 );
 ```
--  Dentro de los archivos.py hay algunos que use y otros que no como por ejemplo el de procedimiento porque me quedo malo y era preferible hacerlo a mano al ser tan poquitos los datos que habia que poner.
 
-- A la hora de importar los csv en las tablas asegurate de que antes de importarlo, en las opciones le des un tick al HEADS (no me acuerdo como se llamaba exactamente la opcion disculpa)
+- A la hora de importar los csv en las tablas asegurese de que antes de importarlo, en las opciones le des un tick al HEADS (no me acuerdo como se llamaba exactamente la opcion disculpa)
 
 **Orden recomendado de los imports:**
 1. personal
 2. paciente
 3. procedimiento
 4. horas
+5. contacto
+6. consulta
+7. ficha
+8. transaccion
 
 ## Librerias necesarias
 - Faker
