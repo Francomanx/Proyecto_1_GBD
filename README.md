@@ -96,7 +96,7 @@ CREATE TABLE ficha (
 );
 ```
 
-- A la hora de importar los csv en las tablas asegurese de que antes de importarlo, en las opciones de import habilite los headers
+- A la hora de importar los csv en las tablas asegurese de que antes de importarlo, en las opciones de import habilite los headers.
 
 **Orden recomendado de los imports:**
 1. personal
@@ -107,15 +107,6 @@ CREATE TABLE ficha (
 6. consulta
 7. ficha
 8. transaccion
-
-## Librerias necesarias
-- Faker
-```bash
-pip install faker
-```
-
-# Consideraciones
-- Implementar la codificación UTF-8 a los datos mediante la libreria unicodedata.
 
 ## Indices agregados
 - **Contexto de la Query:** Ingreso de cada profesional y monto que cobra el centro de salud a cada profesional en arriendos de instalaciones.
@@ -281,6 +272,14 @@ SELECT
   END AS ingreso_profesional
 FROM
   transaccion
-  JOIN horas ON transaccion.id_hora = h.id
-  JOIN personal ON transaccion.rut_personal = p.rut;
+  JOIN horas ON transaccion.id_hora = horas.id
+  JOIN personal ON transaccion.rut_personal = personal.rut;
 ```
+## Librerias necesarias
+- Faker
+```bash
+pip install faker
+```
+
+## Consideraciones
+- Implementar la codificación UTF-8 a los datos mediante la libreria unicodedata.
