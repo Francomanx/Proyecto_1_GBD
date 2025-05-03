@@ -96,7 +96,7 @@ CREATE TABLE ficha (
 );
 ```
 
-- A la hora de importar los csv en las tablas asegurese de que antes de importarlo, en las opciones le des un tick al HEADS (no me acuerdo como se llamaba exactamente la opcion disculpa)
+- A la hora de importar los csv en las tablas asegurese de que antes de importarlo, en las opciones de import habilite los headers
 
 **Orden recomendado de los imports:**
 1. personal
