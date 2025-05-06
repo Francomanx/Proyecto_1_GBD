@@ -122,7 +122,7 @@ select
   SUM(
     CASE
       -- Consulta médica.
-      WHEN horas.tipo = 1 THEN transaccion.monto * (1-personal.porcentaje)
+      WHEN horas.tipo = 1 THEN transaccion.monto * (1-personal.porcentaje*0.01)
       -- Pabellón.
       WHEN horas.tipo = 2 THEN transaccion.monto * 0.05                     
       ELSE 0
@@ -131,7 +131,7 @@ select
   SUM(
     CASE
       -- Consulta médica.
-      WHEN horas.tipo = 1 THEN transaccion.monto * transaccion.porcentaje
+      WHEN horas.tipo = 1 THEN transaccion.monto * personal.porcentaje*0.01
       -- Pabellón.
       WHEN horas.tipo = 2 THEN transaccion.monto * 0.95                     
       ELSE 0
@@ -143,8 +143,6 @@ FROM
   JOIN personal ON transaccion.rut_personal = personal.rut
 GROUP BY
   personal.rut, personal.nombre, personal.apellido
-ORDER BY
-  "Ingreso del Profesional" DESC;
 ```
 
 ### Indices posibles:
@@ -173,7 +171,7 @@ personal.nombre || ' ' || personal.apellido AS "Nombre Completo",
 SUM(
     CASE
       -- Consulta médica.
-      WHEN horas.tipo = 1 THEN transaccion.monto * transaccion.porcentaje 
+      WHEN horas.tipo = 1 THEN transaccion.monto * personal.porcentaje*0.01
       ELSE 0
     END
 ) AS "Ingreso por Consultas",
@@ -189,8 +187,6 @@ JOIN horas ON transaccion.id_hora = horas.id
 JOIN personal ON transaccion.rut_personal = personal.rut
 GROUP BY
   personal.rut, personal.nombre, personal.apellido
-ORDER BY
-  "Ingreso del Profesional" DESC;
 ```
 
 - ***b.*** Montos por cobrar a cada médico por concepto de arriendo de las instalaciones.
@@ -201,7 +197,7 @@ personal.nombre || ' ' || personal.apellido AS "Nombre Completo",
 SUM(
     CASE
       -- Consulta médica.
-      WHEN horas.tipo = 1 THEN transaccion.monto * (1-personal.porcentaje)
+      WHEN horas.tipo = 1 THEN transaccion.monto * (1-personal.porcentaje*0.01)
       -- Pabellón.
       WHEN horas.tipo = 2 THEN transaccion.monto * 0.05                     
       ELSE 0
@@ -212,8 +208,6 @@ JOIN horas ON transaccion.id_hora = horas.id
 JOIN personal ON transaccion.rut_personal = personal.rut
 GROUP BY
   personal.rut, personal.nombre, personal.apellido
-ORDER BY
-  "Ingreso del Profesional" DESC;
 ```
 
 - ***c.*** Utilidades percibidas por el centro de salud por Consultas, Pabellones y Arriendos.
@@ -222,7 +216,7 @@ SELECT
 SUM(
     CASE
       -- Consulta médica.
-      WHEN horas.tipo = 1 THEN transaccion.monto * (1-personal.porcentaje)
+      WHEN horas.tipo = 1 THEN transaccion.monto * (1-personal.porcentaje*0.01)
       ELSE 0
     END
 ) AS "Utilidades por Consultas",
@@ -236,7 +230,7 @@ SUM(
 SUM(
     CASE
       -- Arriendos.
-      WHEN horas.tipo = 1 THEN transaccion.monto * (1-personal.porcentaje)
+      WHEN horas.tipo = 1 THEN transaccion.monto * (1-personal.porcentaje*0.01)
       WHEN horas.tipo = 2 THEN transaccion.monto * 0.05                     
       ELSE 0
     END
@@ -261,12 +255,12 @@ SELECT
   horas.tipo AS tipo_atencion,
   transaccion.monto,
   CASE
-      WHEN horas.tipo = 1 THEN transaccion.monto * (1-personal.porcentaje)
+      WHEN horas.tipo = 1 THEN transaccion.monto * (1-personal.porcentaje*0.01)
       WHEN horas.tipo = 2 THEN transaccion.monto * 0.05     
     ELSE 0
   END AS utilidad_empresa,
   CASE
-      WHEN horas.tipo = 1 THEN transaccion.monto * transaccion.porcentaje 
+      WHEN horas.tipo = 1 THEN transaccion.monto * personal.porcentaje*0.01
       WHEN horas.tipo = 2 THEN transaccion.monto * 0.95
     ELSE 0
   END AS ingreso_profesional
@@ -275,6 +269,74 @@ FROM
   JOIN horas ON transaccion.id_hora = horas.id
   JOIN personal ON transaccion.rut_personal = personal.rut;
 ```
+
+## Experimentos
+
+Las siguientes querys son las antes vistas, pero ahora utilizando la tabla generada luego de la
+desnormalización pertinente. Los experimentos con el uso del índice auxiliar no conlleva generar
+querys distintas a las iniciales, por lo cual en esta sección solo se muestran las consultas modificadas.
+
+
+
+
+- ***Query reportes de utilidad:*** Ingreso de cada profesional y monto que cobra el centro de salud a cada profesional en arriendos de instalaciones.
+
+Query para generar reportes de contabilidad:
+
+```sql
+SELECT
+  rut_medico AS "RUT del Profesional",
+  nombre_medico || ' ' || apellido_medico AS "Nombre del Profesional",
+  SUM(ingreso_profesional) AS "Ingreso del Profesional",
+  SUM(utilidad_empresa) AS "Pago a la empresa"
+FROM
+  reporte_contable
+GROUP BY
+  rut_medico, nombre_medico, apellido_medico
+ORDER BY
+  "Ingreso del Profesional" DESC;
+```
+- ***Query a:*** Ingreso de cada profesional y monto que cobra el centro de salud a cada profesional en arriendos de instalaciones.
+
+Query para generar reportes de contabilidad:
+
+```sql
+SELECT 
+  rut_medico AS "RUT del Profesional",
+  nombre_medico || ' ' || apellido_medico AS "Nombre Completo",
+  SUM(CASE WHEN tipo_atencion = 1 THEN ingreso_profesional ELSE 0 END) AS "Ingreso por Consultas",
+  SUM(CASE WHEN tipo_atencion = 2 THEN ingreso_profesional ELSE 0 END) AS "Ingreso por Pabellones"
+FROM reporte_contable
+GROUP BY rut_medico, nombre_medico, apellido_medico;
+```
+- ***Query b:*** Ingreso de cada profesional y monto que cobra el centro de salud a cada profesional en arriendos de instalaciones.
+
+Query para generar reportes de contabilidad:
+
+```sql
+SELECT
+  rut_medico AS "RUT del Profesional",
+  nombre_medico || ' ' || apellido_medico AS "Nombre del Profesional",
+  SUM(utilidad_empresa) AS "Cobros por Arriendo"
+FROM
+  reporte_contable
+GROUP BY
+  rut_medico, nombre_medico, apellido_medico
+ORDER BY
+  "Cobros por Arriendo" DESC;
+```
+- ***Query c:*** Ingreso de cada profesional y monto que cobra el centro de salud a cada profesional en arriendos de instalaciones.
+
+Query para generar reportes de contabilidad:
+
+```sql
+SELECT
+  SUM(CASE WHEN tipo_atencion = 1 THEN utilidad_empresa ELSE 0 END) AS "Utilidades por Consultas",
+  SUM(CASE WHEN tipo_atencion = 2 THEN utilidad_empresa ELSE 0 END) AS "Utilidades por Pabellones",
+  SUM(utilidad_empresa) AS "Utilidades Totales"
+FROM reporte_contable;
+```
+
 ## Librerias necesarias
 - Faker
 ```bash
