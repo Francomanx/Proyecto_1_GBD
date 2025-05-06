@@ -149,14 +149,13 @@ GROUP BY
 ```
 
 ### Indices posibles:
-- personal.rut (M, poca cantidad de datos).
-- horas.id (B, arta cantidad de datos).
-- transaccion.id_hora (B, deberia tener la misma cantidad de elementos que horas).
-- transaccion.rut_personal (B, deberia tener la misma cantidad de elementos que horas).
 
-```sql
-CREATE INDEX idx_horas_id ON horas USING BTREE (id);
-```
+- ‘personal.rut’: baja cantidad de datos y es PK (índice b-tree por defecto).
+- ‘horas.id’: alta cantidad de datos, pero es PK (índice b-tree por defecto).
+- ‘transaccion.id_hora’: debería tener la misma cantidad de elementos que hora, por lo tanto, alta cantidad de datos, además es FK (sin índice b-tree por defecto).
+- ‘transaccion.rut_personal’: debería tener la misma cantidad de elementos que hora, por lo tanto, alta cantidad de datos, además es FK (sin índice b-tree por defecto).
+
+
 ```sql
 CREATE INDEX idx_transaccion_id_hora ON transaccion USING BTREE (id_hora);
 ```
