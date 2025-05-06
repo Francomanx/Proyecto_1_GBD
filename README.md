@@ -298,9 +298,7 @@ GROUP BY
 ORDER BY
   "Ingreso del Profesional" DESC;
 ```
-- ***Query a:*** Ingreso de cada profesional y monto que cobra el centro de salud a cada profesional en arriendos de instalaciones.
-
-Query para generar reportes de contabilidad:
+- ***Query a:*** "Montos por pagar a cada médico por concepto de Consultas y/o Pabellones, separa ambos registros"
 
 ```sql
 SELECT 
@@ -311,13 +309,11 @@ SELECT
 FROM reporte_contable
 GROUP BY rut_medico, nombre_medico, apellido_medico;
 ```
-- ***Query b:*** Ingreso de cada profesional y monto que cobra el centro de salud a cada profesional en arriendos de instalaciones.
-
-Query para generar reportes de contabilidad:
+- ***Query b:***  “Montos por cobrar a cada médico por concepto de arriendo de las instalaciones.”
 
 ```sql
 SELECT
-  rut_medico AS "RUT del Profesional",
+  rut_medico AS "Rut del Profesional",
   nombre_medico || ' ' || apellido_medico AS "Nombre del Profesional",
   SUM(utilidad_empresa) AS "Cobros por Arriendo"
 FROM
@@ -327,9 +323,7 @@ GROUP BY
 ORDER BY
   "Cobros por Arriendo" DESC;
 ```
-- ***Query c:*** Ingreso de cada profesional y monto que cobra el centro de salud a cada profesional en arriendos de instalaciones.
-
-Query para generar reportes de contabilidad:
+- ***Query c:*** “Utilidades percibidas por el centro de salud por Consultas, Pabellones y Arriendos.”
 
 ```sql
 SELECT
