@@ -302,9 +302,9 @@ ORDER BY
 - ***Query a:*** "Montos por pagar a cada médico por concepto de Consultas y/o Pabellones, separa ambos registros"
 
 ```sql
-SELECT
-  rut_medico AS "RUT del Profesional"
-  nombre_medico || ' ' || apellido_medico AS "Nombre Completo
+SELECT 
+  rut_medico AS "RUT del Profesional",
+  nombre_medico || ' ' || apellido_medico AS "Nombre Completo",
   SUM(CASE WHEN tipo_atencion = 1 THEN ingreso_profesional ELSE 0 END) AS "Ingreso por Consultas",
   SUM(CASE WHEN tipo_atencion = 2 THEN ingreso_profesional ELSE 0 END) AS "Ingreso por Pabellones"
 FROM reporte_contable
