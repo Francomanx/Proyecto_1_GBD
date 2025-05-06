@@ -1,5 +1,8 @@
 # Proyecto_1_GBD
 
+Este proyecto permite reflejar un escenario realista de gestión de servicios médicos privados, destacando la importancia de una base de datos bien estructurada para la trazabilidad de información clínica y financiera, y la toma de decisiones estratégicas a partir de datos confiables y eficientes.
+
+
 ## Tablas
 
 ```sql
